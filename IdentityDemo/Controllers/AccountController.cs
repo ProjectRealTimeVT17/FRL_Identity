@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Facebook;
+using System;
 using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
@@ -17,6 +18,16 @@ namespace IdentityDemo.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
+
+        public static string OEmail { get; set; }
+
+        public static string OBirthday { get; set; }
+
+        public static string OFname { get; set; }
+
+        public static string OLname { get; set; }
+
+        public static string OPicture { get; set; }
 
         public AccountController()
         {
@@ -343,7 +354,34 @@ namespace IdentityDemo.Controllers
                     // If the user does not have an account, then prompt the user to create an account
                     ViewBag.ReturnUrl = returnUrl;
                     ViewBag.LoginProvider = loginInfo.Login.LoginProvider;
-                    return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = loginInfo.Email });
+                    if (loginInfo.Login.LoginProvider == "Facebook")
+                    {
+                        var identity =
+                            AuthenticationManager.GetExternalIdentity(DefaultAuthenticationTypes.ExternalCookie);
+                        var access_token = identity.FindFirstValue("FacebookAccessToken");
+                        var fb = new FacebookClient(access_token);
+                        dynamic uEmail = fb.Get("/me?fields=email");
+                        dynamic uFname = fb.Get("/me?fields=first_name");
+                        dynamic uLname = fb.Get("/me?fields=last_name");
+                        dynamic uBirthday = fb.Get("/me?fields=birthday");
+                        dynamic uPicture = fb.Get("/me?fields=picture.height(200)");
+
+                        OEmail = uEmail.email;
+                        OFname = uFname.first_name;
+                        OLname = uLname.last_name;
+                        OBirthday = uBirthday.birthday;
+                        OPicture = uPicture.picture.data.url;
+
+                    }
+                    return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel
+                    {
+                        Email = OEmail,
+                        ExtBirthDay = OBirthday,
+                        ExtFirstName = OFname,
+                        ExtLastName = OLname,
+                        Picture = OPicture
+                        
+                    });
             }
         }
 

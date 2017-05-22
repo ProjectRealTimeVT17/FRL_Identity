@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Claims;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
@@ -6,6 +7,7 @@ using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.Google;
 using Owin;
 using IdentityDemo.Models;
+using Microsoft.Owin.Security.Facebook;
 
 namespace IdentityDemo
 {
@@ -54,9 +56,27 @@ namespace IdentityDemo
             //   consumerKey: "",
             //   consumerSecret: "");
 
-            //app.UseFacebookAuthentication(
-            //   appId: "",
-            //   appSecret: "");
+            FacebookAuthenticationOptions fbOptions = new FacebookAuthenticationOptions()
+            {
+                AppId = "264416100697688",
+                AppSecret = "150d83c5b91385645d674dc397fea0f1",
+                Provider = new FacebookAuthenticationProvider()
+                {
+                    OnAuthenticated = async context =>
+                    {
+                        if (context != null)
+                            context.Identity.AddClaim(new Claim("FacebookAccessToken", context.AccessToken));
+                    }
+                }
+            };
+
+            fbOptions.Scope.Add("public_profile");
+            fbOptions.Scope.Add("email");
+            fbOptions.Scope.Add("user_birthday");
+
+       
+
+            app.UseFacebookAuthentication(fbOptions);
 
             //app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
             //{

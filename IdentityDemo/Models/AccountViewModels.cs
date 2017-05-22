@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace IdentityDemo.Models
@@ -6,8 +7,31 @@ namespace IdentityDemo.Models
     public class ExternalLoginConfirmationViewModel
     {
         [Required]
+        [Display(Name = "Username")]
+        public string ExtUsername { get; set; }
+
+
+        [Required]
+        [EmailAddress]
         [Display(Name = "Email")]
         public string Email { get; set; }
+
+        [Required]
+        [Display(Name = "First Name")]
+        public string ExtFirstName { get; set; }
+
+        [Required]
+        [Display(Name = "Last Name")]
+        public string ExtLastName { get; set; }
+
+
+        [Required]
+        //[DataType(DataType.Date)]
+        [Display(Name = "Birthday (MM/dd/yyyy)")]
+        public string ExtBirthDay { get; set; }
+
+        public string Picture { get; set; }
+
     }
 
     public class ExternalLoginListViewModel
